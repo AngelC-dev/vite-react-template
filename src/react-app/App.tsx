@@ -47,32 +47,4 @@ export default function App() {
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-            gap: "14px",
-            marginTop: "40px",
-          }}
-        >
-          {[
-            ["Cluster State", "ONLINE"],
-            ["Primary GPU", "RTX 5090"],
-            ["Live Nodes", "3 Visible"],
-            ["Security Posture", "Redacted"],
-          ].map(([label, value]) => (
-            <div
-              key={label}
-              style={{
-                background: "#111",
-                padding: "16px",
-                borderRadius: "14px",
-                border: "1px solid rgba(255,0,255,0.14)",
-                boxShadow: "0 0 18px rgba(255,0,255,0.14)",
-              }}
-            >
-              <div style={{ color: "rgba(255,255,255,0.58)", fontSize: "0.9rem" }}>{label}</div>
-              <div style={{ marginTop: "8px", fontWeight: 800, fontSize: "1.5rem" }}>{value}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
+            gap: "14px
