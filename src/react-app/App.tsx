@@ -412,7 +412,9 @@ export default function App() {
           <div style={sectionTitle}>AI Layer</div>
 
           <div style={{ ...cardStyle, padding: "22px" }}>
-            <div style={{ fontSize: "1.15rem", fontWeight: 700, color: "#ff7dff" }}>
+            <div
+              style={{ fontSize: "1.15rem", fontWeight: 700, color: "#ff7dff" }}
+            >
               Operator Insight
             </div>
             <p
