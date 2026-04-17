@@ -1,4 +1,4 @@
-export default function App() {
+ export default function App() {
   return (
     <div
       style={{
@@ -18,7 +18,7 @@ export default function App() {
             marginBottom: "16px",
           }}
         >
-          AKAZORTAC AI NODE LAB V2
+          AKAZORTAC AI NODE LAB V3
         </div>
 
         <h1
