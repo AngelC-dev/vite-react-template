@@ -1,61 +1,45 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
-type NodeStatus = "ONLINE" | "IDLE" | "SYNCING" | "OFFLINE";
-
-type NodeInfo = {
-  name: string;
-  role: string;
-  status: NodeStatus;
-  zone: string;
-  health: number;
+type MetricCardProps = {
+  label: string;
+  value: string;
 };
 
-function StatusPill({ status }: { status: NodeStatus }) {
-  const styles: Record<NodeStatus, React.CSSProperties> = {
-    ONLINE: {
-      color: "#9bffb1",
-      background: "rgba(0,255,100,0.10)",
-      border: "1px solid rgba(0,255,100,0.22)",
-      boxShadow: "0 0 12px rgba(0,255,100,0.14)",
-    },
-    IDLE: {
-      color: "#9ffcff",
-      background: "rgba(0,255,255,0.10)",
-      border: "1px solid rgba(0,255,255,0.22)",
-      boxShadow: "0 0 12px rgba(0,255,255,0.14)",
-    },
-    SYNCING: {
-      color: "#ffd36f",
-      background: "rgba(255,210,0,0.10)",
-      border: "1px solid rgba(255,210,0,0.22)",
-      boxShadow: "0 0 12px rgba(255,210,0,0.14)",
-    },
-    OFFLINE: {
-      color: "#ff9b9b",
-      background: "rgba(255,0,80,0.10)",
-      border: "1px solid rgba(255,0,80,0.22)",
-      boxShadow: "0 0 12px rgba(255,0,80,0.14)",
-    },
-  };
-
+function MetricCard({ label, value }: MetricCardProps) {
   return (
-    <span
+    <div
       style={{
-        ...styles[status],
-        padding: "7px 11px",
-        borderRadius: "999px",
-        fontSize: "0.72rem",
-        fontWeight: 800,
-        letterSpacing: "0.08em",
-        display: "inline-block",
+        background: "rgba(255,255,255,0.04)",
+        border: "1px solid rgba(255,255,255,0.08)",
+        borderRadius: "20px",
+        padding: "22px",
+        backdropFilter: "blur(12px)",
+        boxShadow: "0 0 24px rgba(0,0,0,0.25)",
       }}
     >
-      {status}
-    </span>
+      <div
+        style={{
+          color: "rgba(255,255,255,0.6)",
+          fontSize: "0.95rem",
+          marginBottom: "10px",
+        }}
+      >
+        {label}
+      </div>
+      <div
+        style={{
+          fontSize: "2rem",
+          fontWeight: 800,
+          color: "#fff",
+        }}
+      >
+        {value}
+      </div>
+    </div>
   );
 }
 
-function MetricBar({
+function TelemetryBar({
   label,
   value,
   color,
@@ -67,19 +51,17 @@ function MetricBar({
   suffix?: string;
 }) {
   return (
-    <div style={{ marginBottom: "18px" }}>
+    <div style={{ marginBottom: "22px" }}>
       <div
         style={{
           display: "flex",
           justifyContent: "space-between",
-          gap: "12px",
           marginBottom: "8px",
-          color: "rgba(255,255,255,0.86)",
-          fontSize: "0.98rem",
+          color: "rgba(255,255,255,0.8)",
         }}
       >
         <span>{label}</span>
-        <span style={{ fontWeight: 800 }}>
+        <span style={{ fontWeight: 700 }}>
           {value}
           {suffix}
         </span>
@@ -88,19 +70,19 @@ function MetricBar({
       <div
         style={{
           height: "12px",
-          background: "rgba(255,255,255,0.10)",
           borderRadius: "999px",
+          background: "rgba(255,255,255,0.08)",
           overflow: "hidden",
         }}
       >
         <div
           style={{
-            width: `${Math.max(6, Math.min(100, value))}%`,
-            height: "12px",
+            width: `${Math.max(6, value)}%`,
+            height: "100%",
             borderRadius: "999px",
             background: color,
-            boxShadow: `0 0 14px ${color}`,
-            transition: "0.5s ease",
+            boxShadow: `0 0 18px ${color}`,
+            transition: "0.45s ease",
           }}
         />
       </div>
@@ -109,354 +91,240 @@ function MetricBar({
 }
 
 export default function App() {
-  const [pulse, setPulse] = useState(0);
   const [gpuUtil, setGpuUtil] = useState(18);
   const [gpuTemp, setGpuTemp] = useState(41);
-  const [networkHealth, setNetworkHealth] = useState(93);
+  const [uptime, setUptime] = useState(99);
   const [jobs, setJobs] = useState(1);
-  const [uptime] = useState(99.3);
-  const [insightIndex, setInsightIndex] = useState(0);
-
-  const nodes: NodeInfo[] = useMemo(
-    () => [
-      {
-        name: "zortac",
-        role: "Primary GPU Node",
-        status: "ONLINE",
-        zone: "Private Mesh",
-        health: 97,
-      },
-      {
-        name: "i9node",
-        role: "Compute Worker",
-        status: "IDLE",
-        zone: "US East",
-        health: 91,
-      },
-      {
-        name: "ar-io-datum-i7",
-        role: "Storage / Data Node",
-        status: "SYNCING",
-        zone: "Private Mesh",
-        health: 88,
-      },
-    ],
-    []
-  );
-
-  const insights = [
-    "Public view is sanitized. Internal addressing and control paths remain private.",
-    "Mesh health is stable. Node aliases exposed, topology withheld.",
-    "Primary GPU lane is healthy. Safe telemetry visible, management layer hidden.",
-    "Public dashboard active. Private controls should stay behind Tailscale or Access.",
-  ];
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setPulse((p) => (p + 1) % 100);
-
-      setGpuUtil((v) => {
-        const next = v + (Math.random() * 12 - 6);
-        return Math.max(7, Math.min(96, Math.round(next)));
-      });
-
-      setGpuTemp((v) => {
-        const next = v + (Math.random() * 4 - 2);
-        return Math.max(34, Math.min(78, Math.round(next)));
-      });
-
-      setNetworkHealth((v) => {
-        const next = v + (Math.random() * 4 - 2);
-        return Math.max(82, Math.min(100, Math.round(next)));
-      });
-
+      setGpuUtil((v) => Math.max(8, Math.min(95, Math.round(v + (Math.random() * 10 - 5)))));
+      setGpuTemp((v) => Math.max(35, Math.min(76, Math.round(v + (Math.random() * 4 - 2)))));
+      setUptime((v) => Math.max(97, Math.min(100, Math.round(v + (Math.random() * 2 - 1)))));
       setJobs((v) => {
         const rand = Math.random();
-        if (rand > 0.82) return Math.min(4, v + 1);
-        if (rand < 0.18) return Math.max(0, v - 1);
+        if (rand > 0.8) return Math.min(5, v + 1);
+        if (rand < 0.25) return Math.max(0, v - 1);
         return v;
       });
     }, 1800);
 
-    const insightTimer = setInterval(() => {
-      setInsightIndex((i) => (i + 1) % insights.length);
-    }, 4200);
-
-    return () => {
-      clearInterval(timer);
-      clearInterval(insightTimer);
-    };
-  }, [insights.length]);
-
-  const onlineNodes = nodes.filter((n) => n.status !== "OFFLINE").length;
-
-  const cardStyle: React.CSSProperties = {
-    background:
-      "linear-gradient(180deg, rgba(20,20,20,0.96), rgba(8,8,8,0.96))",
-    padding: "18px",
-    borderRadius: "18px",
-    border: "1px solid rgba(255,0,255,0.14)",
-    boxShadow: "0 0 20px rgba(255,0,255,0.12)",
-    transition: "0.28s ease",
-  };
-
-  const sectionTitle: React.CSSProperties = {
-    color: "#18f0ff",
-    fontSize: "clamp(1.6rem, 5vw, 2.2rem)",
-    fontWeight: 900,
-    marginBottom: "18px",
-  };
+    return () => clearInterval(timer);
+  }, []);
 
   return (
     <div
       style={{
         minHeight: "100vh",
         background:
-          "radial-gradient(circle at top right, rgba(255,0,255,0.16), transparent 26%), radial-gradient(circle at left bottom, rgba(0,255,255,0.10), transparent 24%), #000",
+          "radial-gradient(circle at top left, rgba(103,80,255,0.18), transparent 28%), radial-gradient(circle at top right, rgba(0,255,255,0.12), transparent 24%), linear-gradient(180deg, #050505 0%, #0a0a0f 100%)",
         color: "#fff",
         fontFamily: "Arial, Helvetica, sans-serif",
-        paddingBottom: "90px",
       }}
     >
       <div
         style={{
-          position: "sticky",
-          top: 0,
-          zIndex: 20,
-          background: "rgba(0,0,0,0.58)",
-          backdropFilter: "blur(12px)",
-          borderBottom: "1px solid rgba(255,255,255,0.08)",
+          maxWidth: "1180px",
+          margin: "0 auto",
+          padding: "28px 20px 90px",
         }}
       >
         <div
           style={{
-            maxWidth: "1100px",
-            margin: "0 auto",
-            padding: "14px 18px",
             display: "flex",
-            alignItems: "center",
             justifyContent: "space-between",
-            gap: "12px",
+            alignItems: "center",
+            gap: "16px",
+            marginBottom: "52px",
           }}
         >
           <div>
             <div
               style={{
-                color: "#ff4df8",
-                letterSpacing: "0.28em",
-                fontSize: "0.8rem",
+                fontSize: "0.82rem",
+                letterSpacing: "0.24em",
+                color: "#9d7bff",
+                marginBottom: "8px",
               }}
             >
               AKAZORTAC
             </div>
-            <div style={{ fontWeight: 800, fontSize: "1.05rem" }}>
+            <div style={{ fontSize: "1.15rem", fontWeight: 700 }}>
               AI Node Lab
             </div>
           </div>
 
           <div
             style={{
-              padding: "8px 12px",
+              padding: "10px 16px",
               borderRadius: "999px",
-              color: "#a8ffff",
-              background: "rgba(0,255,255,0.08)",
-              border: "1px solid rgba(0,255,255,0.24)",
-              boxShadow: `0 0 ${10 + pulse / 8}px rgba(0,255,255,0.18)`,
-              fontWeight: 700,
-              fontSize: "0.9rem",
+              background: "rgba(255,255,255,0.05)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              color: "#9efcff",
+              fontWeight: 600,
             }}
           >
-            Mesh Healthy
+            System Healthy
           </div>
-        </div>
-      </div>
-
-      <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "36px 20px 0" }}>
-        <div style={{ textAlign: "center", padding: "18px 0 34px" }}>
-          <div
-            style={{
-              display: "inline-block",
-              color: "#ff5dff",
-              fontSize: "0.92rem",
-              letterSpacing: "0.30em",
-              marginBottom: "18px",
-            }}
-          >
-            AKAZORTAC AI NODE LAB V4
-          </div>
-
-          <h1
-            style={{
-              margin: 0,
-              fontSize: "clamp(2.8rem, 10vw, 5.6rem)",
-              lineHeight: 1.04,
-              fontWeight: 900,
-            }}
-          >
-            ⚡ Enter the <span style={{ color: "#ff00ff" }}>Akazortac</span> Grid
-          </h1>
-
-          <p
-            style={{
-              maxWidth: "860px",
-              margin: "24px auto 0",
-              color: "rgba(255,255,255,0.74)",
-              fontSize: "clamp(1.05rem, 4vw, 1.35rem)",
-              lineHeight: 1.8,
-            }}
-          >
-            AI-tech compute lab for secure nodes, GPU workloads, private services,
-            and future automation.
-          </p>
         </div>
 
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-            gap: "16px",
+            gridTemplateColumns: "1.2fr 0.8fr",
+            gap: "24px",
           }}
         >
-          {[
-            ["Cluster State", "ONLINE"],
-            ["Primary GPU", "RTX 5090"],
-            ["Live Nodes", `${onlineNodes} Visible`],
-            ["Jobs Active", `${jobs}`],
-          ].map(([label, value]) => (
+          <div
+            style={{
+              background: "rgba(255,255,255,0.03)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              borderRadius: "28px",
+              padding: "34px",
+              backdropFilter: "blur(14px)",
+              boxShadow: "0 0 30px rgba(0,0,0,0.28)",
+            }}
+          >
             <div
-              key={label}
-              style={cardStyle}
-              onMouseOver={(e) => {
-                e.currentTarget.style.boxShadow =
-                  "0 0 28px rgba(255,0,255,0.28)";
-                e.currentTarget.style.transform = "translateY(-2px)";
+              style={{
+                display: "inline-block",
+                padding: "8px 14px",
+                borderRadius: "999px",
+                background: "rgba(157,123,255,0.12)",
+                border: "1px solid rgba(157,123,255,0.24)",
+                color: "#c5b4ff",
+                fontSize: "0.85rem",
+                fontWeight: 700,
+                marginBottom: "24px",
               }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.boxShadow =
-                  "0 0 20px rgba(255,0,255,0.12)";
-                e.currentTarget.style.transform = "translateY(0)";
+            >
+              Private Compute Infrastructure
+            </div>
+
+            <h1
+              style={{
+                margin: 0,
+                fontSize: "clamp(2.6rem, 8vw, 5.2rem)",
+                lineHeight: 1.02,
+                fontWeight: 900,
+              }}
+            >
+              Build on the
+              <br />
+              <span style={{ color: "#9d7bff" }}>Akazortac</span> Grid
+            </h1>
+
+            <p
+              style={{
+                marginTop: "24px",
+                maxWidth: "720px",
+                color: "rgba(255,255,255,0.72)",
+                fontSize: "1.15rem",
+                lineHeight: 1.8,
+              }}
+            >
+              AI-ready node infrastructure for GPU workloads, secure services,
+              private tooling, and future automation. Designed like a startup,
+              operated like a control plane.
+            </p>
+
+            <div
+              style={{
+                display: "flex",
+                gap: "14px",
+                flexWrap: "wrap",
+                marginTop: "28px",
+              }}
+            >
+              <button
+                style={{
+                  padding: "14px 22px",
+                  borderRadius: "14px",
+                  border: "none",
+                  background: "linear-gradient(90deg, #9d7bff, #00e5ff)",
+                  color: "#050505",
+                  fontWeight: 800,
+                  fontSize: "1rem",
+                  cursor: "pointer",
+                }}
+              >
+                Launch Dashboard
+              </button>
+
+              <button
+                style={{
+                  padding: "14px 22px",
+                  borderRadius: "14px",
+                  background: "transparent",
+                  border: "1px solid rgba(255,255,255,0.14)",
+                  color: "#fff",
+                  fontWeight: 700,
+                  fontSize: "1rem",
+                  cursor: "pointer",
+                }}
+              >
+                View Infrastructure
+              </button>
+            </div>
+          </div>
+
+          <div
+            style={{
+              background: "rgba(255,255,255,0.03)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              borderRadius: "28px",
+              padding: "28px",
+              backdropFilter: "blur(14px)",
+              boxShadow: "0 0 30px rgba(0,0,0,0.28)",
+            }}
+          >
+            <div
+              style={{
+                fontSize: "1.05rem",
+                fontWeight: 700,
+                marginBottom: "18px",
+              }}
+            >
+              Live Telemetry
+            </div>
+
+            <TelemetryBar label="GPU Utilization" value={gpuUtil} color="#00e5ff" />
+            <TelemetryBar label="GPU Temperature" value={gpuTemp} color="#ff4dcb" suffix="°C" />
+            <TelemetryBar label="Uptime" value={uptime} color="#8dff65" />
+
+            <div
+              style={{
+                marginTop: "22px",
+                padding: "16px",
+                borderRadius: "18px",
+                background: "rgba(255,255,255,0.04)",
+                border: "1px solid rgba(255,255,255,0.06)",
               }}
             >
               <div
                 style={{
-                  color: "rgba(255,255,255,0.55)",
-                  fontSize: "0.95rem",
-                  marginBottom: "10px",
+                  color: "rgba(255,255,255,0.58)",
+                  fontSize: "0.88rem",
+                  marginBottom: "8px",
                 }}
               >
-                {label}
+                Operator Insight
               </div>
-              <div style={{ fontSize: "2.2rem", fontWeight: 900 }}>{value}</div>
-            </div>
-          ))}
-        </div>
-
-        <div style={{ marginTop: "48px" }}>
-          <div style={sectionTitle}>Live Telemetry</div>
-
-          <div style={{ ...cardStyle, padding: "22px" }}>
-            <MetricBar label="GPU Utilization" value={gpuUtil} color="cyan" />
-            <MetricBar label="GPU Temperature" value={gpuTemp} color="magenta" suffix="°C" />
-            <MetricBar
-              label="Network Health"
-              value={networkHealth}
-              color="#8bff5a"
-              suffix="%"
-            />
-            <MetricBar label="Uptime" value={Math.round(uptime)} color="#6aa8ff" suffix="%" />
-          </div>
-        </div>
-
-        <div style={{ marginTop: "48px" }}>
-          <div style={{ ...sectionTitle, color: "#ff46ff" }}>Node Presence</div>
-
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-              gap: "16px",
-            }}
-          >
-            {nodes.map((node) => (
               <div
-                key={node.name}
-                style={cardStyle}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.boxShadow =
-                    "0 0 24px rgba(0,255,255,0.20)";
-                  e.currentTarget.style.transform = "translateY(-2px)";
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.boxShadow =
-                    "0 0 20px rgba(255,0,255,0.12)";
-                  e.currentTarget.style.transform = "translateY(0)";
+                style={{
+                  color: "rgba(255,255,255,0.82)",
+                  lineHeight: 1.6,
                 }}
               >
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    gap: "10px",
-                    marginBottom: "12px",
-                  }}
-                >
-                  <div style={{ fontWeight: 900, fontSize: "1.25rem" }}>{node.name}</div>
-                  <StatusPill status={node.status} />
-                </div>
-
-                <div style={{ color: "rgba(255,255,255,0.75)", marginBottom: "8px" }}>
-                  {node.role}
-                </div>
-                <div style={{ color: "#9ffcff", fontSize: "0.95rem", marginBottom: "16px" }}>
-                  {node.zone}
-                </div>
-
-                <MetricBar label="Health Score" value={node.health} color="#ff49f8" />
+                Public view is sanitized. Node aliases and safe health signals
+                are visible. Internal addressing and private control surfaces
+                remain hidden.
               </div>
-            ))}
-          </div>
-        </div>
-
-        <div style={{ marginTop: "48px" }}>
-          <div style={sectionTitle}>Operator Insight</div>
-
-          <div
-            style={{
-              ...cardStyle,
-              padding: "22px",
-              border: "1px solid rgba(0,255,255,0.18)",
-              boxShadow: `0 0 ${14 + pulse / 10}px rgba(0,255,255,0.12)`,
-            }}
-          >
-            <div
-              style={{
-                color: "#ff7dff",
-                fontWeight: 800,
-                fontSize: "1.05rem",
-                marginBottom: "12px",
-                letterSpacing: "0.08em",
-              }}
-            >
-              AI SYSTEM NOTE
-            </div>
-
-            <div
-              style={{
-                color: "rgba(255,255,255,0.78)",
-                lineHeight: 1.75,
-                minHeight: "58px",
-                transition: "0.3s ease",
-              }}
-            >
-              {insights[insightIndex]}
             </div>
           </div>
         </div>
 
-        <div style={{ marginTop: "48px" }}>
-          <div style={{ ...sectionTitle, color: "#fff" }}>Public Security Posture</div>
-
+        <div style={{ marginTop: "28px" }}>
           <div
             style={{
               display: "grid",
@@ -464,15 +332,103 @@ export default function App() {
               gap: "16px",
             }}
           >
+            <MetricCard label="Cluster State" value="ONLINE" />
+            <MetricCard label="Primary GPU" value="RTX 5090" />
+            <MetricCard label="Jobs Active" value={String(jobs)} />
+            <MetricCard label="Visible Nodes" value="3" />
+          </div>
+        </div>
+
+        <div style={{ marginTop: "34px" }}>
+          <div
+            style={{
+              fontSize: "1.5rem",
+              fontWeight: 800,
+              marginBottom: "16px",
+            }}
+          >
+            Node Presence
+          </div>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+              gap: "16px",
+            }}
+          >
             {[
-              "Aliases visible, internal addresses withheld",
-              "Public health indicators only",
-              "Private controls remain behind secure access",
-              "No raw infrastructure endpoints exposed",
-            ].map((item) => (
-              <div key={item} style={cardStyle}>
-                <div style={{ color: "rgba(255,255,255,0.82)", lineHeight: 1.6 }}>
-                  {item}
+              ["zortac", "Primary GPU Node", "ONLINE", "Private Mesh"],
+              ["i9node", "Compute Worker", "IDLE", "US East"],
+              ["ar-io-datum-i7", "Storage / Data Node", "SYNCING", "Private Mesh"],
+            ].map(([name, role, status, zone]) => (
+              <div
+                key={name}
+                style={{
+                  background: "rgba(255,255,255,0.03)",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  borderRadius: "22px",
+                  padding: "22px",
+                  backdropFilter: "blur(12px)",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    gap: "12px",
+                    alignItems: "center",
+                    marginBottom: "14px",
+                  }}
+                >
+                  <div style={{ fontSize: "1.2rem", fontWeight: 800 }}>{name}</div>
+                  <div
+                    style={{
+                      padding: "7px 12px",
+                      borderRadius: "999px",
+                      fontSize: "0.72rem",
+                      fontWeight: 800,
+                      letterSpacing: "0.08em",
+                      color:
+                        status === "ONLINE"
+                          ? "#8dffb3"
+                          : status === "IDLE"
+                          ? "#9efcff"
+                          : "#ffd46f",
+                      background:
+                        status === "ONLINE"
+                          ? "rgba(0,255,120,0.10)"
+                          : status === "IDLE"
+                          ? "rgba(0,229,255,0.10)"
+                          : "rgba(255,212,111,0.10)",
+                      border:
+                        status === "ONLINE"
+                          ? "1px solid rgba(0,255,120,0.18)"
+                          : status === "IDLE"
+                          ? "1px solid rgba(0,229,255,0.18)"
+                          : "1px solid rgba(255,212,111,0.18)",
+                    }}
+                  >
+                    {status}
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    color: "rgba(255,255,255,0.72)",
+                    marginBottom: "8px",
+                  }}
+                >
+                  {role}
+                </div>
+
+                <div
+                  style={{
+                    color: "#9d7bff",
+                    fontSize: "0.92rem",
+                  }}
+                >
+                  {zone}
                 </div>
               </div>
             ))}
