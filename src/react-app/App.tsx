@@ -18,7 +18,7 @@
             marginBottom: "16px",
           }}
         >
-          AKAZORTAC AI NODE LAB V3
+          AKAZORTAC AI NODE LAB V4
         </div>
 
         <h1
