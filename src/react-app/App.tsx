@@ -1,19 +1,28 @@
 export default function App() {
+  const utilization = 0;
+  const temp = 34;
+
+  const cardStyle: React.CSSProperties = {
+    background: "#111",
+    padding: "15px",
+    borderRadius: "10px",
+    boxShadow: "0 0 15px rgba(255,0,255,0.2)",
+    transition: "0.3s",
+  };
+
   return (
     <div
       style={{
         background: "#000",
         color: "white",
         minHeight: "100vh",
-        paddingBottom: "80px", // ✅ spacing fix
+        paddingBottom: "80px",
         fontFamily: "Arial, sans-serif",
       }}
     >
-      {/* HERO */}
       <div style={{ padding: "40px", textAlign: "center" }}>
         <h1 style={{ fontSize: "3rem", margin: 0 }}>
-          ⚡ Enter the{" "}
-          <span style={{ color: "#ff00ff" }}>Akazortac</span> Grid
+          ⚡ Enter the <span style={{ color: "#ff00ff" }}>Akazortac</span> Grid
         </h1>
 
         <p style={{ opacity: 0.7, marginTop: "20px" }}>
@@ -21,7 +30,6 @@ export default function App() {
         </p>
       </div>
 
-      {/* DASHBOARD */}
       <div style={{ padding: "20px" }}>
         <h2 style={{ color: "#ff00ff" }}>Node Dashboard</h2>
 
@@ -33,14 +41,14 @@ export default function App() {
             marginTop: "20px",
           }}
         >
-          {/* ✅ Glow cards */}
           <div
-            style={{
-              background: "#111",
-              padding: "15px",
-              borderRadius: "10px",
-              boxShadow: "0 0 15px rgba(255,0,255,0.2)",
-            }}
+            style={cardStyle}
+            onMouseOver={(e) =>
+              (e.currentTarget.style.boxShadow = "0 0 25px rgba(255,0,255,0.5)")
+            }
+            onMouseOut={(e) =>
+              (e.currentTarget.style.boxShadow = "0 0 15px rgba(255,0,255,0.2)")
+            }
           >
             GPU Status
             <br />
@@ -48,12 +56,13 @@ export default function App() {
           </div>
 
           <div
-            style={{
-              background: "#111",
-              padding: "15px",
-              borderRadius: "10px",
-              boxShadow: "0 0 15px rgba(255,0,255,0.2)",
-            }}
+            style={cardStyle}
+            onMouseOver={(e) =>
+              (e.currentTarget.style.boxShadow = "0 0 25px rgba(255,0,255,0.5)")
+            }
+            onMouseOut={(e) =>
+              (e.currentTarget.style.boxShadow = "0 0 15px rgba(255,0,255,0.2)")
+            }
           >
             GPU
             <br />
@@ -61,12 +70,13 @@ export default function App() {
           </div>
 
           <div
-            style={{
-              background: "#111",
-              padding: "15px",
-              borderRadius: "10px",
-              boxShadow: "0 0 15px rgba(255,0,255,0.2)",
-            }}
+            style={cardStyle}
+            onMouseOver={(e) =>
+              (e.currentTarget.style.boxShadow = "0 0 25px rgba(255,0,255,0.5)")
+            }
+            onMouseOut={(e) =>
+              (e.currentTarget.style.boxShadow = "0 0 15px rgba(255,0,255,0.2)")
+            }
           >
             Uptime
             <br />
@@ -74,12 +84,13 @@ export default function App() {
           </div>
 
           <div
-            style={{
-              background: "#111",
-              padding: "15px",
-              borderRadius: "10px",
-              boxShadow: "0 0 15px rgba(255,0,255,0.2)",
-            }}
+            style={cardStyle}
+            onMouseOver={(e) =>
+              (e.currentTarget.style.boxShadow = "0 0 25px rgba(255,0,255,0.5)")
+            }
+            onMouseOut={(e) =>
+              (e.currentTarget.style.boxShadow = "0 0 15px rgba(255,0,255,0.2)")
+            }
           >
             Jobs
             <br />
@@ -88,40 +99,40 @@ export default function App() {
         </div>
       </div>
 
-      {/* ✅ SINGLE TELEMETRY (duplicate removed) */}
       <div style={{ padding: "20px" }}>
         <h2 style={{ color: "cyan" }}>GPU Telemetry</h2>
 
         <div style={{ marginTop: "15px" }}>
-          Utilization: 0%
+          Utilization: {utilization}%
           <div style={{ background: "#222", height: "10px", borderRadius: "5px" }}>
             <div
               style={{
-                width: "10%",
+                width: `${Math.max(5, utilization)}%`,
                 height: "10px",
                 background: "cyan",
                 borderRadius: "5px",
+                transition: "0.4s ease",
               }}
             />
           </div>
         </div>
 
         <div style={{ marginTop: "15px" }}>
-          Temp: 34°C
+          Temp: {temp}°C
           <div style={{ background: "#222", height: "10px", borderRadius: "5px" }}>
             <div
               style={{
-                width: "34%",
+                width: `${Math.max(5, temp)}%`,
                 height: "10px",
                 background: "magenta",
                 borderRadius: "5px",
+                transition: "0.4s ease",
               }}
             />
           </div>
         </div>
       </div>
 
-      {/* STACK */}
       <div style={{ padding: "20px" }}>
         <h2>Stack</h2>
         <p style={{ opacity: 0.7 }}>
